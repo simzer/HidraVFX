@@ -25,6 +25,7 @@ along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 #include "layer.h"
 #include "pnm.h"
 #include "colorfx.h"
+#include "blending.h"
 
 static char *help_str =
     "Usage: hidravfx [command] [options]\n"
@@ -56,9 +57,11 @@ int main(int argc, char *argv[])
   int err;
 
   char *inFile;
+  char *addFile;
   char *outFile;
   char *command;
   tLayerF image;
+  tLayerF addimg;
 
   opt_init(argc, argv);
 
@@ -71,6 +74,7 @@ int main(int argc, char *argv[])
 
   outFile = opt_get("out");
   inFile  = opt_get("in");
+  addFile  = opt_get("add");
   command  = opt_get("cmd");
 
   err = pfm_load(inFile, &image);
@@ -79,6 +83,18 @@ int main(int argc, char *argv[])
     fprintf(stderr, "error %d: Could not read file %s\n", err, inFile);
     return(err);
   }
+
+  if (addFile != NULL)
+  {
+    err = pfm_load(addFile, &addimg);
+    if (err != 0)
+    {
+      fprintf(stderr, "error %d: Could not read file %s\n", err, addFile);
+      return(err);
+    }
+  }
+
+  err = 1;
 
 #undef EFFECT
 #define EFFECT(name,calc) \
@@ -91,9 +107,26 @@ int main(int argc, char *argv[])
     err = 0;            \
   }
 
-  err = 1;
-
   COLOREFFECTS
+
+#undef BLENDING
+#define BLENDING(name,calc) \
+  if (0 == strcmp(command, #name))                                              \
+  {                                                                             \
+    if (addFile == NULL)                                                        \
+    {                                                                           \
+      err = 1;                                                                  \
+      fprintf(stderr, "error %d: additional file not specified.\n", err);       \
+      return(err);                                                              \
+    }                                                                           \
+    name(image.ch[0], addimg.ch[0], image.w, image.h, print_process);           \
+    name(image.ch[1], addimg.ch[1], image.w, image.h, print_process);           \
+    name(image.ch[2], addimg.ch[2], image.w, image.h, print_process);           \
+    print_process(100);                                                         \
+    err = 0;            \
+  }
+
+  BLENDINGS
 
   if (err != 0)
     {

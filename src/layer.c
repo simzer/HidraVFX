@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************/
 
+#include "stdlib.h"
 #include "layer.h"
 
 tLayerF layerF(int w, int h)
