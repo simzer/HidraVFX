@@ -88,7 +88,6 @@ int main(int argc, char *argv[])
     name(image.ch[1], image.w, image.h, print_process);                         \
     name(image.ch[2], image.w, image.h, print_process);                         \
     print_process(100);                                                         \
-    printf("done\n");   \
     err = 0;            \
   }
 

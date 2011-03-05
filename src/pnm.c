@@ -81,7 +81,7 @@ int pfm_save(char *outFile, tLayerF *image)
 
   fprintf(out, "PF\n");
   fprintf(out, "%d %d\n", image->w, image->h);
-  fprintf(out, "1.0\n");
+  fprintf(out, "-1.0\n");
 
   for (y = image->t; y < image->t + image->h; y++)
   {

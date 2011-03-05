@@ -28,7 +28,6 @@ void name(tMapF map, int w, int h, int fproc(int))                              
 {                                                                               \
   int x, y;                                                                     \
   float src, tar;                                                               \
-                                                                                \
   for (y = 0; y < h; y++)                                                       \
   {                                                                             \
     if (fproc != NULL) { fproc(y * 100 / h); }                                  \

@@ -11,3 +11,4 @@ src/Makefile
 bintest/*.png
 test/*.pfm
 bin
+*.png
