@@ -42,4 +42,4 @@ void name(tMapF map, int w, int h, int fproc(int))                              
   }                                                                             \
 }
 
-#include "colorfx.inc"
+COLOREFFECTS

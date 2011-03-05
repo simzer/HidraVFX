@@ -8,4 +8,6 @@ src/CMakeFiles
 src/CMakeCache.txt
 src/cmake_install.cmake
 src/Makefile
+bintest/*.png
+test/*.pfm
 bin
