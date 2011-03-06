@@ -35,8 +35,14 @@ static char *help_str =
     "                           (mandatory option)\n"
     "  --in=<file>              Input <file> PFM format file. stdin used if not specified.\n"
     "  --out=<file>             Output <file> PFM format file. stdout used if not specified.\n"
-    "  --help                   print this help page"
+    "  --help                   print this help page\n"
+    "  --help=<command>         prints option list for <command>\n"
+    "  --aa=#                   anti alias switch 0=off, 1=on\n"
+    "  --add=<file>             addition file for blendings.\n"
     "\n"
+    "Available commands:\n";
+static char *help_str_end = 
+    "\n\n"
     "For bug reporting instructions see README.\n"
     "\n";
 
@@ -61,21 +67,46 @@ int main(int argc, char *argv[])
   char *addFile;
   char *outFile;
   char *command;
+  char *help;
   tLayerF image;
   tLayerF addimg;
   tLayerF result;
 
   opt_init(argc, argv);
 
-  if (opt_get("help") != NULL)
+  help = opt_get("help");
+  if (help != NULL)
   {
-    printf("%s", help_str);
+    if (0) {}
+#undef  PF
+#undef  PL
+#undef  EFFECT
+#define PF(name) "  " #name "\n"
+#define PL(name) "  " #name "\n"
+#define EFFECT(name, params, init, calc) \
+    else if (0 == strcmp(help, #name)) { \
+      printf("Available options for command " #name ":\n" params); \
+    }
+    COLOREFFECTS
+    CONFORMS
+    else
+    {
+      printf("%s", help_str);
+#undef  EFFECT
+#undef  BLENDING
+#define EFFECT(name, params, init, calc) printf(#name ", ");
+#define BLENDING(name,calc)              printf(#name ", ");
+      printf("\nEffects: ");       COLOREFFECTS
+      printf("\n\nDistortions: "); CONFORMS
+      printf("\n\nBlendings: ");   BLENDINGS
+      printf("%s", help_str_end);
+    }
     opt_free();
     return(0);
   }
 
-  outFile = opt_get("out");
-  inFile  = opt_get("in");
+  outFile  = opt_get("out");
+  inFile   = opt_get("in");
   addFile  = opt_get("add");
   command  = opt_get("cmd");
 
