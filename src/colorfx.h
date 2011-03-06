@@ -20,13 +20,12 @@ along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 #ifndef COLORFX_H_
 #define COLORFX_H_
 
-#define COLOREFFECTS \
-EFFECT(none,      tar = src                  ) \
-EFFECT(invert,    tar = 1.0 - src            ) \
-EFFECT(pitinvert, tar = sqrt(1.0 - src*src)  ) \
+#include "effect.h"
 
-#define EFFECT(name,calc)                                                       \
-extern void name(tMapF map, int w, int h, int fproc(int));
+#define COLOREFFECTS \
+EFFECT(none,      , , tar = src                  ) \
+EFFECT(invert,    , , tar = 1.0 - src            ) \
+EFFECT(pitinvert, , , tar = sqrt(1.0 - src*src)  ) \
 
 COLOREFFECTS
 

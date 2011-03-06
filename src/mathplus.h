@@ -10,7 +10,10 @@
 
 #define PI 3.14159265358979323846
 
-static inline float min(float a, float b) { return (a < b ? a : b ); }
-static inline float max(float a, float b) { return (a > b ? a : b ); }
+static inline double sqr(double a) { return (a * a); }
+static inline double min(double a, double b) { return (a < b ? a : b ); }
+static inline double max(double a, double b) { return (a > b ? a : b ); }
+static inline double limit(double min, double var, double max)
+  { return (min > var ? min : (var > max ? max : var) ); }
 
 #endif /* MATHPLUS_H_ */

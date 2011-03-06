@@ -17,20 +17,13 @@ You should have received a copy of the GNU General Public License
 along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************/
 
-#ifndef OPTIONS_H_
-#define OPTIONS_H_
+#ifndef EFFECT_H_
+#define EFFECT_H_
 
-/** Initialise options. */
-extern int opt_init(int argc, char *argv[]);
+#define PF(var) float var = opt_getf(#var);
+#define PL(var) int   var = opt_getl(#var);
 
-/** Gets option string for key */
-extern char* opt_get(char* key);
+#define EFFECT(name, params, init, calc) \
+extern void name(tMapF map, tMapF res, int w, int h, int fproc(int));
 
-/** Gets option in different format  */
-float opt_getf(char* key);
-long int opt_getl(char* key);
-
-/** Free memory allocated by opt. */
-extern void opt_free(void);
-
-#endif /* OPTIONS_H_ */
+#endif /* EFFECT_H_ */

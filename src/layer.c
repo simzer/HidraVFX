@@ -17,7 +17,11 @@ You should have received a copy of the GNU General Public License
 along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************/
 
-#include "stdlib.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include <mathplus.h>
+#include "interpol.h"
 #include "layer.h"
 
 tLayerF layerF(int w, int h)
@@ -47,3 +51,39 @@ tLayerF layerF(int w, int h)
 
   return(layer);
 }
+
+float mapGetPix(tMapF map, int x, int y, int t, int l, int w, int h)
+{
+  return( ((x>=l) && (x<l+w) && (y>=t) && (y<t+h))
+          ? map[x-l][y-t] : 0.0/0.0 );
+}
+
+void mapSetPix(tMapF map, int x, int y, float pix, int t, int l, int w, int h)
+{
+  if ((x>=l) && (x<l+w) && (y>=t)  && (y<t+h)) map[x-l][y-t] = pix;
+}
+
+float mapGetAAPix(tMapF map, float x, float y, int t, int l, int w, int h)
+{
+  float x0,y0;
+  int x1,y1,x2,y2;
+  if ((x>=l) && (x<=l+w-1) && (y>=t) && (y<=t+h-1))
+  {
+     x1 = x;
+     x0 = x-x1;
+     y1 = y;
+     y0 = y-y1;
+     x1 = x1-l;
+     y1 = y1-t;
+     x2 = (x1==x) ? x1 : x1+1;
+     y2 = (y1==y) ? y1 : y1+1;
+     return linear2(map[y1][x1],map[y1][x2],map[y2][x1],map[y2][x2],x0,y0);
+  }
+  else
+  {
+    return(0.0/0.0);
+  }
+}
+
+
+

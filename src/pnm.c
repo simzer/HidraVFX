@@ -55,6 +55,7 @@ int pfm_load(char *inFile, tLayerF *image)
       fread(&((image->ch[0][y])[x]), sizeof(float), 1, in);
       fread(&((image->ch[1][y])[x]), sizeof(float), 1, in);
       fread(&((image->ch[2][y])[x]), sizeof(float), 1, in);
+      image->ch[3][y][x] = 1.0;
     }
   }
 

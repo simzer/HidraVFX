@@ -26,6 +26,7 @@ along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 #include "pnm.h"
 #include "colorfx.h"
 #include "blending.h"
+#include "conform.h"
 
 static char *help_str =
     "Usage: hidravfx [command] [options]\n"
@@ -43,11 +44,11 @@ int print_process(int progress)
 {
   if (progress < 100)
   {
-    printf("\033[0Gprogress: %d %%", progress);
+    fprintf(stderr, "\033[0Gprogress: %d %%", progress);
   }
   else
   {
-      printf("\033[0Gprogress: %d %%, finished.\n", progress);
+    fprintf(stderr, "\033[0Gprogress: %d %%, finished.\n", progress);
   }
   return(1);
 }
@@ -62,6 +63,7 @@ int main(int argc, char *argv[])
   char *command;
   tLayerF image;
   tLayerF addimg;
+  tLayerF result;
 
   opt_init(argc, argv);
 
@@ -92,22 +94,31 @@ int main(int argc, char *argv[])
       fprintf(stderr, "error %d: Could not read file %s\n", err, addFile);
       return(err);
     }
+    if ((addimg.w != image.w) || (addimg.h != image.h))
+    {
+      err = 1;
+      fprintf(stderr, "error %d: size of input pictures are not match\n", err);
+      return(err);
+    }
   }
 
   err = 1;
 
+  result = layerF(image.w, image.h);
+
 #undef EFFECT
-#define EFFECT(name,calc) \
+#define EFFECT(name, params, init, calc) \
   if (0 == strcmp(command, #name))                                              \
   {                                                                             \
-    name(image.ch[0], image.w, image.h, print_process);                         \
-    name(image.ch[1], image.w, image.h, print_process);                         \
-    name(image.ch[2], image.w, image.h, print_process);                         \
+    name(image.ch[0], result.ch[0], image.w, image.h, print_process);           \
+    name(image.ch[1], result.ch[1], image.w, image.h, print_process);           \
+    name(image.ch[2], result.ch[2], image.w, image.h, print_process);           \
     print_process(100);                                                         \
     err = 0;            \
   }
 
   COLOREFFECTS
+  CONFORMS
 
 #undef BLENDING
 #define BLENDING(name,calc) \
@@ -123,6 +134,7 @@ int main(int argc, char *argv[])
     name(image.ch[1], addimg.ch[1], image.w, image.h, print_process);           \
     name(image.ch[2], addimg.ch[2], image.w, image.h, print_process);           \
     print_process(100);                                                         \
+    result = image;     \
     err = 0;            \
   }
 
@@ -134,7 +146,7 @@ int main(int argc, char *argv[])
     return(err);
     }
 
-  err = pfm_save(outFile, &image);
+  err = pfm_save(outFile, &result);
   if (err != 0)
   {
     fprintf(stderr, "error %d: Could not write file %s\n", err, outFile);

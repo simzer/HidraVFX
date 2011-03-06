@@ -19,6 +19,7 @@ along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdlib.h>
 #include <string.h>
+#include "options.h"
 
 static char** opt_keys = NULL;
 static char** opt_vals = NULL;
@@ -127,4 +128,16 @@ char* opt_get(char* key)
     }
 
   return(NULL);
+}
+
+float opt_getf(char* key)
+{
+  char *val = opt_get(key);
+  return((val != NULL) ? strtof(val, NULL) : 0.0/0.0);
+}
+
+long int opt_getl(char* key)
+{
+  char *val = opt_get(key);
+  return((val != NULL) ?strtol(val, NULL, 10) : 0);
 }

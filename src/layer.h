@@ -32,4 +32,8 @@ tLayerF;
 
 extern tLayerF layerF(int w, int h);
 
+float mapGetAAPix(tMapF map, float x, float y, int t, int l, int w, int h);
+void mapSetPix(tMapF map, int x, int y, float pix, int t, int l, int w, int h);
+float mapGetPix(tMapF map, int x, int y, int t, int l, int w, int h);
+
 #endif

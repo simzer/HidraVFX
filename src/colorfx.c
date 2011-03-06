@@ -23,11 +23,13 @@ along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 #include "colorfx.h"
 
 #undef EFFECT
-#define EFFECT(name,calc)                                                       \
-void name(tMapF map, int w, int h, int fproc(int))                              \
+#define EFFECT(name, params, init, calc) \
+void name(tMapF map, tMapF res, int w, int h, int fproc(int))                   \
 {                                                                               \
+  params                                                                        \
   int x, y;                                                                     \
   float src, tar;                                                               \
+  init                                                                          \
   for (y = 0; y < h; y++)                                                       \
   {                                                                             \
     if (fproc != NULL) { fproc(y * 100 / h); }                                  \
@@ -36,7 +38,7 @@ void name(tMapF map, int w, int h, int fproc(int))                              
     {                                                                           \
       src = map[y][x];                                                          \
       calc;                                                                     \
-      map[y][x] = tar;                                                          \
+      res[y][x] = tar;                                                          \
     }                                                                           \
   }                                                                             \
 }
