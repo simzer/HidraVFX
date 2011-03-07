@@ -12,3 +12,7 @@ bintest/*.png
 test/*.pfm
 bin
 *.png
+*.cmake
+*.deb
+install_manifest.txt
+_CPack_Packages/
