@@ -19,7 +19,16 @@ for (<DATA>)
 __DATA__
 none
 invert 
+geoinvert
 pitinvert
+upshift          --shift=0.2
+bright           --bright=0.2
+contrast         --gain=1.5
+dark             --gain=0.5
+light            --gain=0.5
+bright2          --bright=0.2
+stone            --power=2
+cloud            --limit=0.4 --xmax=4
 allanon          --add=add.pfm 
 multiply         --add=add.pfm 
 bleach           --add=add.pfm 

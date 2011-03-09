@@ -19,6 +19,7 @@ along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdlib.h>
 #include <math.h>
+#include "options.h"
 #include "layer.h"
 #include "colorfx.h"
 
@@ -37,7 +38,7 @@ void name(tMapF map, tMapF res, int w, int h, int fproc(int))                   
     for (x = 0; x < w; x++)                                                     \
     {                                                                           \
       src = map[y][x];                                                          \
-      calc;                                                                     \
+      calc                                                                      \
       res[y][x] = tar;                                                          \
     }                                                                           \
   }                                                                             \

@@ -102,6 +102,7 @@ int opt_init(int argc, char *argv[])
     else
       {
       /* no standard long option */
+
       }
 
     opt_keys[i] = key;
