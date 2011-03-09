@@ -29,20 +29,22 @@ along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 #include "conform.h"
 
 static char *help_str =
-    "Usage: hidravfx [command] [options]\n"
-    "Options:\n"
-    "  --cmd=<command>          Apply <command> effect on the input image\n"
-    "                           (mandatory option)\n"
-    "  --in=<file>              Input <file> PFM format file. stdin used if not specified.\n"
-    "  --out=<file>             Output <file> PFM format file. stdout used if not specified.\n"
-    "  --help                   print this help page\n"
-    "  --help=<command>         prints option list for <command>\n"
-    "  --aa=#                   anti alias switch 0=off, 1=on\n"
-    "  --add=<file>             addition file for blendings.\n"
+    "HidraVFX is a high dynamic range visual effect command line application."
     "\n"
-    "Available commands:\n";
-static char *help_str_end = 
-    "\n\n"
+    "Usage: hidravfx COMMAND [options] INPUTFILE\n"
+    "\n"
+    "File formats:\n"
+    "   PFM                Portable Float Map.\n"
+    "\n"
+    "Options:\n"
+    "   help               print this help page\n"
+    "   help commands      prints command list\n"
+    "   help COMMAND       prints option list for COMMAND\n"
+    "   INPUTFILE          Input PFM format file. stdin used if not specified.\n"
+    "   --out=FILE         Output PFM format file. stdout used if not specified.\n"
+    "   --aa=#             anti alias switch 0=off, 1=on\n"
+    "   --add=FILE         addition file for blendings.\n"
+    "\n"
     "For bug reporting instructions see README.\n"
     "\n";
 
@@ -67,48 +69,62 @@ int main(int argc, char *argv[])
   char *addFile;
   char *outFile;
   char *command;
-  char *help;
   tLayerF image;
   tLayerF addimg;
   tLayerF result;
 
   opt_init(argc, argv);
 
-  help = opt_get("help");
-  if (help != NULL)
+  command = opt_get("1");
+  if (command == NULL)
   {
-    if (0) {}
+    err = 1;
+    fprintf(stderr, "error %d: command not specified. Type 'hidravfx help' for usage.\n", err);
+    return(err);
+  }
+
+  if (0 == strcmp(command, "help"))
+  {
+    command = opt_get("2");
+    if(command == NULL)
+    {
+      printf("%s", help_str);
+    }
+    else if (0 == strcmp(command, "commands"))
+    {
+#undef  EFFECT
+#undef  BLENDING
+#define EFFECT(name, params, init, calc) printf("      " #name "\n");
+#define BLENDING(name,calc)              printf("      " #name "\n");
+      printf("\n   Effects:\n");       COLOREFFECTS
+      printf("\n   Distortions:\n"); CONFORMS
+      printf("\n   Blendings:\n");   BLENDINGS
+    }
 #undef  PF
 #undef  PL
 #undef  EFFECT
 #define PF(name) "  " #name "\n"
 #define PL(name) "  " #name "\n"
 #define EFFECT(name, params, init, calc) \
-    else if (0 == strcmp(help, #name)) { \
+    else if (0 == strcmp(command, #name)) { \
       printf("Available options for command " #name ":\n" params); \
     }
     COLOREFFECTS
     CONFORMS
     else
     {
-      printf("%s", help_str);
-#undef  EFFECT
-#undef  BLENDING
-#define EFFECT(name, params, init, calc) printf(#name ", ");
-#define BLENDING(name,calc)              printf(#name ", ");
-      printf("\nEffects: ");       COLOREFFECTS
-      printf("\n\nDistortions: "); CONFORMS
-      printf("\n\nBlendings: ");   BLENDINGS
-      printf("%s", help_str_end);
+      err = 1;
+      fprintf(stderr, "error %d: unknown command %s\n", err, command);
+      return(err);
     }
+
     opt_free();
     return(0);
   }
 
   outFile  = opt_get("out");
-  inFile   = opt_get("in");
+  inFile   = opt_get("2");
   addFile  = opt_get("add");
-  command  = opt_get("cmd");
 
   err = pfm_load(inFile, &image);
   if (err != 0)
@@ -172,10 +188,11 @@ int main(int argc, char *argv[])
   BLENDINGS
 
   if (err != 0)
-    {
+  {
+    err = 1;
     fprintf(stderr, "error %d: unknown command %s\n", err, command);
     return(err);
-    }
+  }
 
   err = pfm_save(outFile, &result);
   if (err != 0)

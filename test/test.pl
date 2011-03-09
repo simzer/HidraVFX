@@ -9,7 +9,7 @@ for (<DATA>)
   ($cmd, @params) = split /\s+/, $_;
   if ( -e "$cmd.png" ) {} else {
     print "Testing $cmd command\n";
-    `../bin/hidravfx --cmd=$cmd --in=test.pfm --out=$cmd.pfm @params`;
+    `../bin/hidravfx $cmd --out=$cmd.pfm @params test.pfm`;
     `convert $cmd.pfm $cmd.png`;
   }
 }

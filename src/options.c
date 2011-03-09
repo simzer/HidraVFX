@@ -18,6 +18,7 @@ along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************/
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include "options.h"
 
@@ -47,7 +48,7 @@ int opt_init(int argc, char *argv[])
   int key_len;
   char *val;
   int val_len;
-
+  int argnum = 0;
   char *p_eq;
 
   optc = argc;
@@ -102,7 +103,18 @@ int opt_init(int argc, char *argv[])
     else
       {
       /* no standard long option */
+      val_len = strlen(argv[i]) + 1 /* \0 */;
+      key_len = 5+1;
 
+      key = malloc(key_len);
+      val = malloc(val_len);
+
+      if (NULL == key) return(1);
+      if (NULL == val) return(1);
+
+      strncpy(val, argv[i], val_len);
+      sprintf(key, "%d", argnum);
+      argnum++;
       }
 
     opt_keys[i] = key;
