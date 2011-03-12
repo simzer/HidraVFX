@@ -40,7 +40,7 @@ static char *help_str =
     "   help COMMAND       prints option list for COMMAND\n"
     "   INPUTFILE          Input PFM format file. stdin used if not specified.\n"
     "   --out=FILE         Output PFM format file. stdout used if not specified.\n"
-    "   --aa=#             anti alias switch 0=off, 1=on\n"
+    "   --aa=N             NxN anti alias if applicable (default = 1).\n"
     "\n"
     "For bug reporting instructions see README.\n"
     "\n";

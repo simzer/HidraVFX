@@ -113,16 +113,23 @@ float getaapix(tLayerF l, int ch, float x, float y)
       && (x>=l.l) && (x<=l.l+l.w-1) && (y>=l.t) && (y<=l.t+l.h-1))
   {
      x1 = x;
-     x0 = x-x1;
      y1 = y;
-     y0 = y-y1;
-     x1 = x1-l.l;
-     y1 = y1-l.t;
-     x2 = (x1==x) ? x1 : x1+1;
-     y2 = (y1==y) ? y1 : y1+1;
-     return linear2(l.ch[ch][y1][x1],l.ch[ch][y1][x2],
-                    l.ch[ch][y2][x1],l.ch[ch][y2][x2],
-                    x0,y0);
+     if((x1 == x) && (y1 == y))
+     {
+       return(l.ch[ch][y1][x1]);
+     }
+     else
+     {
+       x0 = x-x1;
+       y0 = y-y1;
+       x1 = x1-l.l;
+       y1 = y1-l.t;
+       x2 = (x1==x) ? x1 : x1+1;
+       y2 = (y1==y) ? y1 : y1+1;
+       return linear2(l.ch[ch][y1][x1],l.ch[ch][y1][x2],
+                      l.ch[ch][y2][x1],l.ch[ch][y2][x2],
+                      x0,y0);
+     }
   }
   else
   {
