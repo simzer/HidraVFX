@@ -23,17 +23,22 @@ along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 typedef float* tLineF;
 typedef tLineF* tMapF;
 
+#define CHANNELS 4
+
 typedef struct
 {
   int l, t, w, h;
-  tMapF ch[4];
+  tMapF ch[CHANNELS];
+  float bg[CHANNELS];
 }
 tLayerF;
 
 extern tLayerF layerF(int w, int h);
+extern tLayerF layerbg(float bg);
+extern tLayerF layerbgs(float bgs[]);
 
-float mapGetAAPix(tMapF map, float x, float y, int t, int l, int w, int h);
-void mapSetPix(tMapF map, int x, int y, float pix, int t, int l, int w, int h);
-float mapGetPix(tMapF map, int x, int y, int t, int l, int w, int h);
+float getaapix(tLayerF l, int ch, float x, float y);
+void setpix(tLayerF l, int ch, int x, int y, float pix);
+float getpix(tLayerF l, int ch, int x, int y);
 
 #endif

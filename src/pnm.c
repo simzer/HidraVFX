@@ -26,21 +26,19 @@ along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 
 int pfm_load(char *inFile, tLayerF *image)
 {
-  FILE *in;
+  FILE *in = NULL;
   int x, y, w, h;
   float factor;
   char c;
-  int res = 0;
 
   if (inFile != NULL)
   {
-    in = fopen(inFile, "r");
-    if (in == NULL) return(1);
+    in = (0 == strcmp(inFile, "--"))
+         ? stdin
+         : fopen(inFile, "r");
   }
-  else
-  {
-    in = stdin;
-  }
+
+  if (in == NULL) return(1);
 
   fscanf(in, "P%c", &c);
   fscanf(in, "%d %d", &w, &h);
@@ -61,7 +59,7 @@ int pfm_load(char *inFile, tLayerF *image)
 
   fclose(in);
 
-  return(res);
+  return(0);
 }
 
 int pfm_save(char *outFile, tLayerF *image)

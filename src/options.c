@@ -27,7 +27,7 @@ static char** opt_vals = NULL;
 static int optc = 0;
 
 void opt_free(void)
-{
+  {
   int i;
 
   for(i = 0; i < optc; i++)
@@ -38,10 +38,10 @@ void opt_free(void)
 
   free(opt_keys);
   free(opt_vals);
-}
+  }
 
 int opt_init(int argc, char *argv[])
-{
+  {
   int i;
 
   char *key;
@@ -122,10 +122,10 @@ int opt_init(int argc, char *argv[])
     }
 
   return(0);
-}
+  }
 
-char* opt_get(char* key)
-{
+int opt_get_id(char* key)
+  {
   int i;
 
   if (opt_keys != NULL)
@@ -135,22 +135,36 @@ char* opt_get(char* key)
       if (   (opt_keys[i] != NULL)
           && (strcmp(opt_keys[i],key) == 0) )
         {
-          return(opt_vals[i]);
+        return(i);
         }
       }
     }
 
-  return(NULL);
-}
+  return(-1);
+  }
+
+char* opt_gets(char* key)
+  {
+  int i = opt_get_id(key);
+
+  if (i != -1)
+    {
+    return(opt_vals[i]);
+    }
+  else
+    {
+    return(NULL);
+    }
+  }
 
 float opt_getf(char* key)
-{
-  char *val = opt_get(key);
+  {
+  char *val = opt_gets(key);
   return((val != NULL) ? strtof(val, NULL) : 0.0/0.0);
-}
+  }
 
 long int opt_getl(char* key)
-{
-  char *val = opt_get(key);
+  {
+  char *val = opt_gets(key);
   return((val != NULL) ?strtol(val, NULL, 10) : 0);
-}
+  }

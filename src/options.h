@@ -20,11 +20,16 @@ along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 #ifndef OPTIONS_H_
 #define OPTIONS_H_
 
+#define opt_get(param) opt_gets(param)
+
 /** Initialise options. */
 extern int opt_init(int argc, char *argv[]);
 
+/** Gets option index for key */
+int opt_get_id(char* key);
+
 /** Gets option string for key */
-extern char* opt_get(char* key);
+extern char* opt_gets(char* key);
 
 /** Gets option in different format  */
 float opt_getf(char* key);

@@ -34,15 +34,16 @@ tLayerF layerF(int w, int h)
   layer.w = w;
   layer.h = h;
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < CHANNELS; i++)
   {
     /* todo: check malloc return value */
     layer.ch[i] = malloc(h * sizeof(tMapF));
+    layer.bg[i] = 0.0/0.0;
   }
 
   for (y = 0; y < h; y++)
   {
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < CHANNELS; i++)
     {
       /* todo: check malloc return value */
       layer.ch[i][y] = malloc(w * sizeof(tLineF));
@@ -52,36 +53,80 @@ tLayerF layerF(int w, int h)
   return(layer);
 }
 
-float mapGetPix(tMapF map, int x, int y, int t, int l, int w, int h)
+tLayerF layerbgs(float bgs[])
 {
-  return( ((x>=l) && (x<l+w) && (y>=t) && (y<t+h))
-          ? map[x-l][y-t] : 0.0/0.0 );
+  tLayerF layer;
+  int i;
+
+  layer.l = 0;
+  layer.t = 0;
+  layer.w = 0;
+  layer.h = 0;
+
+  for (i = 0; i < CHANNELS; i++)
+  {
+    layer.ch[i] = NULL;
+    layer.bg[i] = bgs[i];
+  }
+
+  return(layer);
 }
 
-void mapSetPix(tMapF map, int x, int y, float pix, int t, int l, int w, int h)
+tLayerF layerbg(float bg)
 {
-  if ((x>=l) && (x<l+w) && (y>=t)  && (y<t+h)) map[x-l][y-t] = pix;
+  tLayerF layer;
+  int i;
+
+  layer.l = 0;
+  layer.t = 0;
+  layer.w = 0;
+  layer.h = 0;
+
+  for (i = 0; i < CHANNELS; i++)
+  {
+    layer.ch[i] = NULL;
+    layer.bg[i] = bg;
+  }
+
+  return(layer);
 }
 
-float mapGetAAPix(tMapF map, float x, float y, int t, int l, int w, int h)
+float getpix(tLayerF l, int ch, int x, int y)
+{
+  return( ( (l.ch[ch] != NULL)
+            && (x>=l.l) && (x<l.l+l.w) && (y>=l.t) && (y<l.t+l.h))
+          ? l.ch[ch][y-l.t][x-l.l] : l.bg[ch] );
+}
+
+void setpix(tLayerF l, int ch, int x, int y, float pix)
+{
+  if ((l.ch[ch] != NULL)
+      && (x>=l.l) && (x<l.l+l.w) && (y>=l.t)  && (y<l.t+l.h))
+    l.ch[ch][y-l.t][x-l.l] = pix;
+}
+
+float getaapix(tLayerF l, int ch, float x, float y)
 {
   float x0,y0;
   int x1,y1,x2,y2;
-  if ((x>=l) && (x<=l+w-1) && (y>=t) && (y<=t+h-1))
+  if ((l.ch[ch] != NULL)
+      && (x>=l.l) && (x<=l.l+l.w-1) && (y>=l.t) && (y<=l.t+l.h-1))
   {
      x1 = x;
      x0 = x-x1;
      y1 = y;
      y0 = y-y1;
-     x1 = x1-l;
-     y1 = y1-t;
+     x1 = x1-l.l;
+     y1 = y1-l.t;
      x2 = (x1==x) ? x1 : x1+1;
      y2 = (y1==y) ? y1 : y1+1;
-     return linear2(map[y1][x1],map[y1][x2],map[y2][x1],map[y2][x2],x0,y0);
+     return linear2(l.ch[ch][y1][x1],l.ch[ch][y1][x2],
+                    l.ch[ch][y2][x1],l.ch[ch][y2][x2],
+                    x0,y0);
   }
   else
   {
-    return(0.0/0.0);
+    return(l.bg[ch]);
   }
 }
 

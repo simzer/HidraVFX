@@ -24,9 +24,7 @@ along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 #include "options.h"
 #include "layer.h"
 #include "pnm.h"
-#include "colorfx.h"
-#include "blending.h"
-#include "conform.h"
+#include "../bin/effects.h"
 
 static char *help_str =
     "HidraVFX is a high dynamic range visual effect command line application."
@@ -43,7 +41,6 @@ static char *help_str =
     "   INPUTFILE          Input PFM format file. stdin used if not specified.\n"
     "   --out=FILE         Output PFM format file. stdout used if not specified.\n"
     "   --aa=#             anti alias switch 0=off, 1=on\n"
-    "   --add=FILE         addition file for blendings.\n"
     "\n"
     "For bug reporting instructions see README.\n"
     "\n";
@@ -61,16 +58,41 @@ int print_process(int progress)
   return(1);
 }
 
+tLayerF getOpt(char *name)
+{
+  tLayerF res;
+  if  (opt_get(name) != NULL)
+  {
+    int err = pfm_load(opt_get(name), &res);
+    if (err != 0)
+    {
+      res = layerbg(opt_getf(name));
+    }
+    else
+    {/*
+      if ((res.w != image.w) || (res.h != image.h))
+      {
+        err = 1;
+        fprintf(stderr, "error %d: size of input pictures are not match\n", err);
+        return(err);
+      }*/
+    }
+  }
+  else
+  {
+    res = layerbg(0.0);
+  }
+  return(res);
+}
+
 int main(int argc, char *argv[])
 {
   int err;
-
+  int i;
   char *inFile;
-  char *addFile;
   char *outFile;
   char *command;
   tLayerF image;
-  tLayerF addimg;
   tLayerF result;
 
   opt_init(argc, argv);
@@ -85,47 +107,56 @@ int main(int argc, char *argv[])
 
   if (0 == strcmp(command, "help"))
   {
-    command = opt_get("2");
-    if(command == NULL)
+    char err = 1;
+    char *helpcommand = opt_get("2");
+    if(helpcommand == NULL)
     {
       printf("%s", help_str);
+      err = 0;
     }
-    else if (0 == strcmp(command, "commands"))
-    {
-#undef  EFFECT
-#undef  BLENDING
-#define EFFECT(name, params, init, calc) printf("      " #name "\n");
-#define BLENDING(name,calc)              printf("      " #name "\n");
-      printf("\n   Effects:\n");       COLOREFFECTS
-      printf("\n   Distortions:\n"); CONFORMS
-      printf("\n   Blendings:\n");   BLENDINGS
-    }
-#undef  PF
-#undef  PL
-#undef  EFFECT
-#define PF(name) "  " #name "\n"
-#define PL(name) "  " #name "\n"
-#define EFFECT(name, params, init, calc) \
-    else if (0 == strcmp(command, #name)) { \
-      printf("Available options for command " #name ":\n" params); \
-    }
-    COLOREFFECTS
-    CONFORMS
     else
     {
-      err = 1;
-      fprintf(stderr, "error %d: unknown command %s\n", err, command);
-      return(err);
+      if (0 == strcmp(helpcommand, "commands"))
+      {
+        for(i = 0; i < effectnum; i++)
+        {
+          printf("  %-20s   %s\n", effectlist[i], effectdescs[i]);
+        }
+        printf("\n");
+        err = 0;
+      }
+      for (i = 0; i < effectnum; i++)
+      {
+        if (0 == strcmp(helpcommand, effectlist[i]))
+        {
+          int n;
+          printf("Command: %s\n  %s\n\n", effectlist[i], effectdescs[i]);
+          printf("Available options for command %s:\n", effectlist[i]);
+          for(n = 0; n < paramnums[i]; n++)
+          {
+            char buffer[50];
+            int index = paramindices[i] + n;
+            sprintf(buffer, "--%s=VALUE", paramlist[index]);
+            printf("  %-15s   %s\n", buffer, paramdescs[index]);
+          }
+          printf("\n");
+          err = 0;
+        }
+      }
+      if (err != 0)
+      {
+        fprintf(stderr, "error %d: unknown command %s\n", err, helpcommand);
+        return(err);
+      }
     }
-
     opt_free();
     return(0);
   }
 
   outFile  = opt_get("out");
   inFile   = opt_get("2");
-  addFile  = opt_get("add");
 
+  if (inFile == NULL) { inFile = "--"; }
   err = pfm_load(inFile, &image);
   if (err != 0)
   {
@@ -133,59 +164,11 @@ int main(int argc, char *argv[])
     return(err);
   }
 
-  if (addFile != NULL)
-  {
-    err = pfm_load(addFile, &addimg);
-    if (err != 0)
-    {
-      fprintf(stderr, "error %d: Could not read file %s\n", err, addFile);
-      return(err);
-    }
-    if ((addimg.w != image.w) || (addimg.h != image.h))
-    {
-      err = 1;
-      fprintf(stderr, "error %d: size of input pictures are not match\n", err);
-      return(err);
-    }
-  }
-
   err = 1;
 
   result = layerF(image.w, image.h);
 
-#undef EFFECT
-#define EFFECT(name, params, init, calc) \
-  if (0 == strcmp(command, #name))                                              \
-  {                                                                             \
-    name(image.ch[0], result.ch[0], image.w, image.h, print_process);           \
-    name(image.ch[1], result.ch[1], image.w, image.h, print_process);           \
-    name(image.ch[2], result.ch[2], image.w, image.h, print_process);           \
-    print_process(100);                                                         \
-    err = 0;            \
-  }
-
-  COLOREFFECTS
-  CONFORMS
-
-#undef BLENDING
-#define BLENDING(name,calc) \
-  if (0 == strcmp(command, #name))                                              \
-  {                                                                             \
-    if (addFile == NULL)                                                        \
-    {                                                                           \
-      err = 1;                                                                  \
-      fprintf(stderr, "error %d: additional file not specified.\n", err);       \
-      return(err);                                                              \
-    }                                                                           \
-    name(image.ch[0], addimg.ch[0], image.w, image.h, print_process);           \
-    name(image.ch[1], addimg.ch[1], image.w, image.h, print_process);           \
-    name(image.ch[2], addimg.ch[2], image.w, image.h, print_process);           \
-    print_process(100);                                                         \
-    result = image;     \
-    err = 0;            \
-  }
-
-  BLENDINGS
+#include "../bin/cmdproc.i"
 
   if (err != 0)
   {
