@@ -71,7 +71,7 @@ int <NAME>(
 }
 
 CODE
-conform => <<CODE,
+distortions => <<CODE,
 /** <DESC> 
  *  \\return Error value */
 int <NAME>(
@@ -127,6 +127,7 @@ my $funccall = <<CODE;
   }
 CODE
 
+my $testcalls    = '';
 my $funcdefs     = '';
 my $funcdecls    = '';
 my $funccalls    = '';
@@ -140,19 +141,23 @@ my $effectcnt    = 0;
 my $paramcnt     = 0;
 my @cmdlist      = '';
 
-for my $type (sort(keys(%effects)))
+for my $group (sort(keys(%effects)))
 {
-  for my $func (sort(keys(%{$effects{$type}})))
+ for my $type (sort(keys(%{$effects{$group}})))
+ {
+  for my $func (sort(keys(%{$effects{$group}->{$type}})))
   {
     my $name = $func;
-    my $desc = $effects{$type}->{$func}->{desc};
-    my $calc = $effects{$type}->{$func}->{calc};
-    my $init = $effects{$type}->{$func}->{init};
-    my $prms = $effects{$type}->{$func}->{prms};
+    my $funchash = $effects{$group}->{$type}->{$func}; 
+    my $desc = $funchash->{desc};
+    my $calc = $funchash->{calc};
+    my $init = $funchash->{init};
+    my $prms = $funchash->{prms};
     my $paramdefs  = '';
     my $paramcalls = '';
     my $paramindex = $paramcnt;
     
+    $testcalls    .= "$func";
     push @cmdlist, $name; 
     $paramindices .= "$paramindex, ";
     for (keys(%{$prms}))
@@ -162,14 +167,18 @@ for my $type (sort(keys(%effects)))
       $paramcalls.= ", getOpt(\"$_\")";
       $paramlist .= "\"$_\",\n";
       $paramdescs.= "\"$prms->{$_}->{desc}\",\n";
+      $testcalls .= (exists $prms->{$_}->{test}) ? " --$_=$prms->{$_}->{test}" : 
+                    (exists $prms->{$_}->{def})  ? " --$_=$prms->{$_}->{def}"  : 
+                                                   '';
       $paramcnt++;
     } 
-    $paramnums .= ($paramcnt-$paramindex).", ";
-    
+    $testcalls   .= "\n";
+    $paramnums   .= ($paramcnt-$paramindex).", ";
+
     $effectlist  .= "  \"$name\",\n";
     $effectdescs .= "  \"$desc\",\n";
       
-    my $fdf = $funcdef{$type};
+    my $fdf = $funcdef{$group};
     $fdf =~ s/<NAME>/$name/g;
     $fdf =~ s/<DESC>/$desc/g;
     $fdf =~ s/<CALC>/$calc/g;
@@ -190,6 +199,7 @@ for my $type (sort(keys(%effects)))
   
     $effectcnt++;
   }
+ }
 }
 open OUT, '>cmdproc.i';
 print OUT <<CODE;
@@ -267,5 +277,7 @@ _hidravfx()
 }
 complete -F _hidravfx hidravfx
 CODE
+
+open OUT, '>../test/tests'; print OUT $testcalls; close OUT;
 
 print "codegen.pl: Code generation done.\n";
