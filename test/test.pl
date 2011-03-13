@@ -61,17 +61,17 @@ hardLight        --add=add.pfm
 softLight        --add=add.pfm 
 vividLight       --add=add.pfm 
 overlay          --add=add.pfm 
-bolyaiSphere     --x0=150 --y0=100 --z0=50 --R=100
-spherize         --x0=150 --y0=100 --rc=200 --factor=80
-invbolyaiSphere  --x0=150 --y0=100 --z0=50 --R=100
-shift            --x0=150 --y0=100 
+bolyaiSphere     --x0=0.5 --y0=0.5 --z0=0.3 --R=0.5
+spherize         --x0=0.5 --y0=0.5 --radius=0.5 --angle=1.0
+invbolyaiSphere  --x0=0.5 --y0=0.5 --z0=0.5 --R=0.6
+shift            --x0=0.3 --y0=0.5 
 polarToDescartes
 descartesToPolar
-rotate           --x0=150 --y0=100 --angle=1.0471 
-swirl            --x0=150 --y0=100 --radial=50 --angle=0.5235 
+rotate           --x0=0.4 --y0=0.5 --angle=1.0471 
+swirl            --x0=0.4 --y0=0.5 --radial=15 --angle=0.5
 pinch            --scale=2
-sinusoidal       --scale=100
-centermirror     --x0=150 --y0=100 
-axismirror       --x0=150 --y0=100 --axisx=10 --axisy=100
-misterx          --rad=100
-tube             --x0=150 --y0=100 --rad=0.1 --numX=6 --numY=2 --dX=0 --dY=0 
+sinusoidal       --scale=1
+centermirror     --x0=0.4 --y0=0.5 
+axismirror       --x0=0.4 --y0=0.5 --axisx=0.4 --axisy=0.5
+misterx          --rad=1
+tube             --x0=0.4 --y0=0.5 --rad=0.1 --numX=6 --numY=3 --dX=0 --dY=0 
