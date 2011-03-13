@@ -19,6 +19,7 @@ along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include <string.h>
 
 #include "options.h"
@@ -94,6 +95,8 @@ int main(int argc, char *argv[])
   char *command;
   tLayerF image;
   tLayerF result;
+
+  srand ( time(NULL) );
 
   opt_init(argc, argv);
 

@@ -55,15 +55,18 @@ int <NAME>(
     {
       ch = 0;
       src = srcimg.ch[ch][iy][ix]; 
-      <CALC>
+      {<CALC>
+      }
       tarimg.ch[ch][iy][ix] = tar;
       ch = 1;
       src = srcimg.ch[ch][iy][ix];
-      <CALC>
+      {<CALC>
+      }
       tarimg.ch[ch][iy][ix] = tar;
       ch = 2;
       src = srcimg.ch[ch][iy][ix];
-      <CALC>
+      {<CALC>
+      }
       tarimg.ch[ch][iy][ix] = tar;
     }
   }

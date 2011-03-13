@@ -170,6 +170,152 @@ basic => {
                      calc => 'tar = add > 0.5 ? 2*src*add : 1-2*(1-src)*(1-add);',
                      prms => {'add' => { desc => "Blend image.", 
                                          test => "add.pfm"}}},
+ },
+ mapgen => {
+  'null' =>    {     desc => 'Empty image.', 
+                     calc => 'tar = 0;'},
+  'color' => {       desc => 'Image with the given color/value', 
+                     calc => 'tar = color;',
+                     prms => {'color'      =>{ desc => "Color of the image", 
+                                               def => 1.0}}},
+  'random' => {      desc => 'Image with random noise', 
+                     calc => 'tar = 1.0 * rand() / RAND_MAX;'},
+  'piramid' => {     desc => 'Four side gradient', 
+                     calc => 'double d = 0;
+                              double cx = (ix<x) ? ix/x : 1-(ix-x)/(w-x);
+                              double cy = (iy<y) ? iy/y : 1-(iy-y)/(h-y);
+                              if ((cx-cy+1 != 0) && (cy >= cx)) d = cx/(cx-cy+1);
+                              if ((cy-cx+1 != 0) && (cy <= cx)) d = cy/(cy-cx+1);
+                              tar = 1-(cos(d*PI)+1)/2;',
+                     prms => {'x' =>    { desc => "", 
+                                          def  => "20"},
+                              'y' =>    { desc => "", 
+                                          def  => "20"}}},,
+  'gradver' => {     desc => 'Vertical gradient', 
+                     calc => 'tar = c1 + (c2-c1)*iy/h;',
+                     prms => {'c1' =>    { desc => "Begin color", 
+                                           def  => "0"},
+                              'c2' =>    { desc => "End color", 
+                                           def  => "1"}}},
+  'gradhor' => {     desc => 'Horizontal gradient', 
+                     calc => 'tar = c1 + (c2-c1)*ix/w;',
+                     prms => {'c1' =>    { desc => "Begin color", 
+                                           def  => "0"},
+                              'c2' =>    { desc => "End color", 
+                                           def  => "1"}}},
+  'sawtooth1D' => {  desc => 'Vertical sawtooth function', 
+                     calc => 'int wl = wavelength*h;
+                              tar = cos( (1.0 * (iy % wl) / wl) * PI/2);',
+                     prms => {'wavelength' => { desc => "", 
+                                                def  => "0.1"}}},
+  'sine1D' =>     {  desc => 'Vertical sine function', 
+                     calc => 'tar = (1+sin(2*PI*iy/(wavelength*h)))/2;',
+                     prms => {'wavelength' => { desc => "", 
+                                                def  => "0.1"}}},
+  'sinepolar' =>  {  desc => 'Polar sine function', 
+                     calc => 'double wl = w*wavelength/(2*PI);
+                              double r  = sqrt(sqr(ix-x*w)+sqr(iy-y*h));
+                              tar = (1+sin(r/wl))/2;',
+                     prms => {'wavelength' => { desc => "",
+                                                def  => "0.1"},
+                              'x' =>          { desc => "", 
+                                                def  => "0.5"},
+                              'y' =>          { desc => "", 
+                                                def  => "0.5"}}},
+  'abssine2D' =>   { desc => '2D absolute sine function',
+                     calc => 'double y = 2 * PI * iy / (h * xwavelen);
+                              double x = 2 * PI * ix / (w * ywavelen);
+                              tar = (fabs(sin(x)) + fabs(sin(y))) / 2;',
+                     prms => {'xwavelen' =>   { desc => "Horizontal wavelength", 
+                                                def  => "0.1"},
+                              'ywavelen' =>   { desc => "Vertical wavelength", 
+                                                def  => "0.1"}}},
+  'sawtooth2D' =>  { desc => '2D sawtooth function',
+                     calc => 'int wx = (int)(w * xwavelen);
+                              int wy = (int)(h * ywavelen);
+                              double y = (PI * (iy % wy) / wy) / 2;
+                              double x = (PI * (ix % wx) / wx) / 2;
+                              tar = min(cos(x),cos(y));',
+                     prms => {'xwavelen' =>   { desc => "Horizontal wavelength", 
+                                                def  => "0.1"},
+                              'ywavelen' =>   { desc => "Vertical wavelength", 
+                                                def  => "0.1"}}},
+  'sinesawtooth2D'=>{desc => '2D sine sawtooth function',
+                     calc => 'int wx = (int)(w * xwavelen);
+                              int wy = (int)(h * ywavelen);
+                              double y = (PI * (iy % wy) / wy) / 2;
+                              double x = (PI * (ix % wx) / wx) / 2;
+                              tar = cos(x) * cos(y);',
+                     prms => {'xwavelen' =>   { desc => "Horizontal wavelength", 
+                                                def  => "0.1"},
+                              'ywavelen' =>   { desc => "Vertical wavelength", 
+                                                def  => "0.1"}}},
+  'sine2D' =>      { desc => '2D sine function',
+                     calc => 'double y = 2 * PI * iy / (h * xwavelen);
+                              double x = 2 * PI * ix / (w * ywavelen);
+                              tar = (1+sin(x)*sin(y))/2;',
+                     prms => {'xwavelen' =>   { desc => "Horizontal wavelength", 
+                                                def  => "0.1"},
+                              'ywavelen' =>   { desc => "Vertical wavelength", 
+                                                def  => "0.1"}}},
+  'sinebrick' =>   { desc => 'Brick shape 2D sine function',
+                     calc => 'double y = 2 * PI * iy / (h * xwavelen);
+                              double x = 2 * PI * ix / (w * ywavelen);
+                              tar = (1+sin(x+(PI/2)*sign(sin(y))))*(fabs(sin(y)))/2;',
+                     prms => {'xwavelen' =>   { desc => "Horizontal wavelength", 
+                                                def  => "0.1"},
+                              'ywavelen' =>   { desc => "Vertical wavelength", 
+                                                def  => "0.1"}}},
+  'sinegrid' =>    { desc => 'Grid like 2D sine function',
+                     calc => 'double y = 2 * PI * iy / (h * xwavelen);
+                              double x = 2 * PI * ix / (w * ywavelen);
+                              tar  =  (1+cos(x))*(1+cos(y)) / 4;',
+                     prms => {'xwavelen' =>   { desc => "Horizontal wavelength", 
+                                                def  => "0.1"},
+                              'ywavelen' =>   { desc => "Vertical wavelength", 
+                                                def  => "0.1"}}},
+  'sinehexagrid' =>{ desc => 'Hexagonal 2D sine grid',
+                     calc => 'double k = sqrt(3)/2;
+                              double y = 2 * PI * iy / (h * xwavelen);
+                              double x = 2 * PI * ix / (w * ywavelen);
+                              tar = (1+cos(y))*(1+cos(k*x+0.5*y))*(1+cos(k*x-0.5*y))/8;',
+                     prms => {'xwavelen' =>   { desc => "Horizontal wavelength", 
+                                                def  => "0.1"},
+                              'ywavelen' =>   { desc => "Vertical wavelength", 
+                                                def  => "0.1"}}},
+  'sinehexa' =>    { desc => 'Hexagonal 2D sine function',
+                     calc => 'double k = sqrt(3)/2;
+                              double y = 2 * PI * iy / (h * xwavelen);
+                              double x = 2 * PI * ix / (w * ywavelen);
+                              tar = fabs(sin(y)*sin(k*x+0.5*y)*sin(k*x-0.5*y));',
+                     prms => {'xwavelen' =>   { desc => "Horizontal wavelength", 
+                                                def  => "0.2"},
+                              'ywavelen' =>   { desc => "Vertical wavelength", 
+                                                def  => "0.2"}}},
+  'sinebear' =>    { desc => '',
+                     init => 'double A[10];
+                              int i;
+                              for (i = 0; i<10; i++) A[i] = 1+(rand() % 200)/100.0;',
+                     calc => 'double y = 2 * PI * iy / (h * xwavelen);
+                              double x = 2 * PI * ix / (w * ywavelen);
+                              tar = 1 + (A[4]*sin(A[0]*sin(A[6]*x)+A[1]*cos(A[7]*y))
+                                        +A[5]*cos(A[2]*cos(A[8]*x)+A[3]*sin(A[9]*y))) / 2;',
+                     prms => {'xwavelen' =>   { desc => "Horizontal wavelength", 
+                                                def  => "0.3"},
+                              'ywavelen' =>   { desc => "Vertical wavelength", 
+                                                def  => "0.3"}}},
+  'piramids' =>    { desc => 'Piramids grid map',
+                     calc => 'double dx = sizex * w;
+                              double x = (ix % (int)(dx));
+                              double y = (iy % (int)(dx));
+                              double d = fabs(x-dx/2)+fabs(y-dx/2);
+                              if (d>dx/2) d = dx-d;
+                              tar = 2*d/dx;
+                              if (0) { tar = 2*tar; if (tar>1) tar = 2-tar; }',
+                     prms => {'sizex'    =>   { desc => "Horizontal wavelength", 
+                                                def  => "0.1"},
+                              'fold'     =>   { desc => "folding", 
+                                                def  => "0"}}},
  }
 },
 distortions => {
@@ -385,4 +531,8 @@ distortions => {
                               'y0' => { def => 0.25 } }},
  }
 }
-); 
+);
+
+
+__DATA__
+ 
