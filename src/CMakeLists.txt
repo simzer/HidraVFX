@@ -6,7 +6,7 @@ INSTALL(
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
-INSTALL_FILES(/etc/bash_completion.d . hidravfx.completion)
+INSTALL_FILES(/etc/bash_completion.d FILES hidravfx_completion)
 INSTALL_FILES(/usr/include/hidravfx .h effects.h layer.h hidra.h)
 ADD_CUSTOM_COMMAND(
    OUTPUT  effects.c effects.h
