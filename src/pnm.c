@@ -26,6 +26,7 @@ along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 
 int pfm_load(char *inFile, tLayerF *image)
 {
+  char buffer[1024];
   FILE *in = NULL;
   int x, y, w, h;
   float factor;
@@ -40,9 +41,12 @@ int pfm_load(char *inFile, tLayerF *image)
 
   if (in == NULL) return(1);
 
-  fscanf(in, "P%c", &c);
-  fscanf(in, "%d %d", &w, &h);
-  fscanf(in, "%f\n", &factor);
+  fgets(buffer, 1024, in);
+  sscanf(buffer, "P%c", &c);
+  while ((fgets(buffer, 1024, in) != NULL) && buffer[0] == '#');
+  sscanf(buffer, "%d %d", &w, &h);
+  while ((fgets(buffer, 1024, in) != NULL) && buffer[0] == '#');
+  sscanf(buffer, "%f\n", &factor);
 
   *image = layerF(w, h);
 
