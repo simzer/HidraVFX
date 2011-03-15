@@ -40,6 +40,14 @@ basic => {
                      calc => 'tar = src<=limit ? 0 : log(xmax*(src-limit)/(1.0-limit)+1)/log(xmax+1);',
                      prms => {'limit'  => { def => 0.25 }, 
                               'xmax'   => { def => 2 }}},
+  'blend' =>       { desc => 'Blends two image.',
+                     calc => 'double alp = alpha * add[3];
+                              tar    = src*(1-alp)+add*alp;',
+                     prms => {'alpha' => { def  => 0.5 },
+                              'add'   => { test => "addimg.pfm" } }},
+  'binary' =>      { desc => 'Cut to binary values based on threshold.',
+                     calc => 'tar = src < threshold ? 0.0 : 1.0;',
+                     prms => {'threshold' => { def  => 0.5 } }},
  },
  blendings => {
   'allanon' => {     desc => 'Mean of pixel pair.', 
@@ -527,12 +535,48 @@ distortions => {
           x1 = x + w * ((1 < x0) ? 1-x0 : -x0);
           y1 = y + h * ((1 < y0) ? 1-y0 : -y0);
                      ',
-                     prms => {'x0' => { def => 0.25 }, 
-                              'y0' => { def => 0.25 } }},
+                     prms => {'x0' =>   { def => 0.25 }, 
+                              'y0' =>   { def => 0.25 } }},
  }
-}
+},
+color => {
+ channel => {
+  'addalpha'   => {  desc => 'Set the parameter map as alpha channel of input.',
+                     calc => 'tar[4] = alpha;',
+                     prms => {'alpha'  => { test => "addimg.pfm" } }},
+  'setchannel'  => { desc => 'Set the parameter map as specified channel of input.',
+                     calc => 'tar[(int)channel] = add;',
+                     prms => {'add'    => { test => "addimg.pfm" },
+                              'channel'=> { def  => 0 } }},
+  'getchannel'  => { desc => 'Get the specified channel of input.',
+                     calc => 'tar[0] = tar[1] = tar[2] = src[(int)channel];
+                              tar[3] = 1;',
+                     prms => {'channel'=> { def => 0 } }},
+  'copychannel' => { desc => 'Copy source channel to target channel.',
+                     calc => 'tar[(int)target] = src[(int)source];',
+                     prms => {'source' => { def => 0 },
+                              'target' => { def => 1 } }},
+  'swapchannels' => {desc => 'Swap source and target channel.',
+                     calc => 'double temp = tar[(int)target];
+                              tar[(int)target] = src[(int)source];
+                              src[(int)source] = temp;',
+                     prms => {'source' => { def => 0 },
+                              'target' => { def => 1 } }},
+  'grayscale'  =>  { desc => 'Grayscale conversion.',
+                     calc => 'tar[0] = tar[1] = tar[2] = 
+                                (src[0] + src[1] + src[2])/3.0;' },
+  'intensity'  =>  { desc => 'Intensity weighted grayscale conversion.',
+                     calc => 'tar[0] = tar[1] = tar[2] = 
+                                0.3 * src[0] + 0.59 * src[1] + 0.11 * src[2];' },
+  'geograyscale'=> { desc => 'Multiplicative grayscale conversion.',
+                     calc => 'tar[0] = tar[1] = tar[2] =
+                                pow(src[0] * src[1] * src[2], 1.0/3.0);' },
+  'pitgrayscale'=> { desc => 'Grayscale conversion.',
+                     calc => 'tar[0] = tar[1] = tar[2] =
+                                sqrt((sqr(src[0])+sqr(src[1])+sqr(src[2]))/3.0);' },
+  }
+ }
 );
 
 
 __DATA__
- 

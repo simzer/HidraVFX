@@ -53,21 +53,46 @@ int <NAME>(
     if (fproc != NULL) { fproc(iy * 100 / h); }
     for (ix = 0; ix < w; ix++)
     {
-      ch = 0;
-      src = srcimg.ch[ch][iy][ix]; 
-      {<CALC>
+      for(ch = 0; ch < CHANNELS - 1; ch++)
+      {
+        src = srcimg.ch[ch][iy][ix]; 
+        {<CALC>
+        }
+        tarimg.ch[ch][iy][ix] = tar;
       }
-      tarimg.ch[ch][iy][ix] = tar;
-      ch = 1;
-      src = srcimg.ch[ch][iy][ix];
-      {<CALC>
+      
+      tarimg.ch[3][iy][ix] = srcimg.ch[3][iy][ix];
+    }
+  }
+  return(err);
+}
+
+CODE
+color => <<CODE,
+/** <DESC> 
+ *  \\return Error value */
+int <NAME>(
+  tLayerF srcimg /**< Source image */,
+  tLayerF tarimg /**< Target image */,
+  int fproc(int) /**< progress indicator function */<PARAMS>)  
+{
+  int err = 0;
+  int ix, iy, ch;
+  int w = srcimg.w;
+  int h = srcimg.h;
+  float src[CHANNELS];
+  float tar[CHANNELS];
+  <INIT>
+  for (iy = 0; iy < h; iy++)
+  {
+    if (fproc != NULL) { fproc(iy * 100 / h); }
+    for (ix = 0; ix < w; ix++)
+    {
+      for (ch = 0; ch < CHANNELS; ch++) tar[ch] = src[ch] = srcimg.ch[ch][iy][ix];
+      ch = 0; 
+      { <CALC>
       }
-      tarimg.ch[ch][iy][ix] = tar;
-      ch = 2;
-      src = srcimg.ch[ch][iy][ix];
-      {<CALC>
-      }
-      tarimg.ch[ch][iy][ix] = tar;
+      for (ch = 0; ch < CHANNELS; ch++) tarimg.ch[ch][iy][ix] = tar[ch];
     }
   }
   return(err);
@@ -165,7 +190,9 @@ for my $group (sort(keys(%effects)))
     $paramindices .= "$paramindex, ";
     for (keys(%{$prms}))
     {
+      $calc =~ s/\b$_\[([^]]*)\]/getpix(_$_,$1,ix,iy)/g;
       $calc =~ s/\b$_\b/getpix($_,ch,ix,iy)/g;
+      $calc =~ s/\b_$_\b/$_/g;
       $paramdefs .= ",\n  tLayerF $_\t/* $prms->{$_}->{desc} */";
       $paramcalls.= ", getOpt(\"$_\")";
       $paramlist .= "\"$_\",\n";
