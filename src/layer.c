@@ -139,18 +139,19 @@ float getaapix(tLayerF l, int ch, float x, float y)
 
 /** Calculate statistics about image:
  *  \return error value */
-int stats(tLayerF srcimg, tLayerStats *stats)
+int stats(tLayerF srcimg, tLayerStats *s)
 {
   int err = 0;
   int ix, iy, ch;
   int w = srcimg.w;
   int h = srcimg.h;
   int count = 0;
+  float src;
   for (ch = 0; ch < CHANNELS; ch++)
   {
-    stats->min[ch]  = 0.0/0.0;
-    stats->max[ch]  = 0.0/0.0;
-    stats->mean[ch] = 0.0/0.0;
+    s->min[ch]  = 0.0/0.0;
+    s->max[ch]  = 0.0/0.0;
+    s->mean[ch] = 0.0/0.0;
   }
   for (iy = 0; iy < h; iy++)
   {
@@ -160,27 +161,34 @@ int stats(tLayerF srcimg, tLayerStats *stats)
       {
         for (ch = 0; ch < CHANNELS; ch++)
         {
-          float src = srcimg.ch[ch][iy][ix];
-          if (   (stats->min[ch] != stats->min[ch])
-              || (src < stats->min[ch])) {
-            stats->min[ch] = src;
+          src = srcimg.ch[ch][iy][ix];
+          if (   (s->min[ch] != s->min[ch]) || (src < s->min[ch])) {
+            s->min[ch] = src;
           }
-          if (   (stats->max[ch] != stats->max[ch])
-              || (src > stats->max[ch])) {
-            stats->max[ch] = src;
+          if (   (s->max[ch] != s->max[ch]) || (src > s->max[ch])) {
+            s->max[ch] = src;
           }
-          stats->mean[ch] = (stats->mean[ch] != stats->mean[ch])
-                            ? src : stats->mean[ch] + src;
-          count++;
+          s->mean[ch] = (s->mean[ch] != s->mean[ch]) ? src : s->mean[ch] + src;
         }
+        src = (srcimg.ch[0][iy][ix]
+               + srcimg.ch[1][iy][ix]
+               + srcimg.ch[2][iy][ix]) / 3.0;
+        if (   (s->intmin != s->intmin) || (src < s->intmin)) {
+          s->intmin = src;
+        }
+        if (   (s->intmax != s->intmax) || (src > s->intmax)) {
+          s->intmax = src;
+        }
+        s->intmean = (s->intmean != s->intmean) ? src : s->intmean + src;
+        count++;
       }
     }
   }
   for (ch = 0; ch < CHANNELS; ch++)
   {
-    stats->mean[ch] = stats->mean[ch]/count;
+    s->mean[ch] = s->mean[ch]/count;
   }
-  stats->visible = count;
+  s->visible = count;
 
   return(err);
 }

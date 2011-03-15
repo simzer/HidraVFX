@@ -46,6 +46,9 @@ typedef struct
   float min[CHANNELS]; /**< minimum value per channel*/
   float max[CHANNELS]; /**< maximum value per channel*/
   float mean[CHANNELS];/**< mean value per channel*/
+  float intmin;        /**< minimum intensity value */
+  float intmax;        /**< maximum intensity value */
+  float intmean;       /**< mean intensity value */
   int   visible;       /**< visible pixels */
 }
 tLayerStats;

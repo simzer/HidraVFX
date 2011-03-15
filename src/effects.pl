@@ -45,7 +45,7 @@ basic => {
                      prms => {'min'    => { def => 0.25 },
                               'max'    => { def => 0.75  } }},
         
-  'autocontrast' =>{ desc => 'Automatic contrast to the available range.', 
+  'autocontrast' =>{ desc => 'Automatic contrast to the available range by channels.', 
                      init => 'tLayerStats s; stats(srcimg, &s);',
                      calc => 'tar = (src-s.min[ch])/(s.max[ch]-s.min[ch]);' },
                              
@@ -62,12 +62,18 @@ basic => {
                      prms => {'limit'  => { def => 0.25 }, 
                               'xmax'   => { def => 2 }}},
                               
-  'blend' =>       { desc => 'Blends two image.',
+  'blend' =>       { desc => 'Blends two image with linear interpolation.',
                      calc => 'double alp = alpha * add[3];
                               tar    = src*(1-alp)+add*alp;',
                      prms => {'alpha' => { def  => 0.5 },
                               'add'   => { test => "addimg.pfm" } }},
                               
+  'cubic' =>       { desc => 'Blends two image with polinomial (Ax^6+Bx^4+Cx^2) interpolation.',
+                     calc => 'double alp = -(4/9)*pow(alpha,6)+(17/9)*pow(alpha,4)-(22/9)*sqr(alpha)+1;
+                              tar = src*alp+add*(1-alp);',
+                     prms => {'alpha' => { def  => 0.5 },
+                              'add'   => { test => "addimg.pfm" } }},
+                                   
   'binary' =>      { desc => 'Cut to binary values based on threshold.',
                      calc => 'tar = src < threshold ? 0.0 : 1.0;',
                      prms => {'threshold' => { def  => 0.5 } }},
@@ -214,6 +220,17 @@ basic => {
                      calc => 'tar = add > 0.5 ? 2*src*add : 1-2*(1-src)*(1-add);',
                      prms => {'add' => { desc => "Blend image.", 
                                          test => "addimg.pfm"}}},
+  'bnoise'  => {     desc => 'Configurable symmetric additional blending', 
+                     calc => 'tar = src + (add-threshold);',
+                     prms => {'add' => { desc => "Blend image.", 
+                                         test => "addimg.pfm"},
+                              'threshold' => { desc => 0.5} }},
+  'bsnoise' => {     desc => 'Configurable symmetric additional blending', 
+                     calc => 'tar = src + min(src,1-src)*(add-threshold)/
+                                          max(threshold,1-threshold);',
+                     prms => {'add' => { desc => "Blend image.", 
+                                         test => "addimg.pfm"},
+                              'threshold' => { desc => 0.5} }},
  },
  mapgen => {
   'null' =>    {     desc => 'Empty image.', 
@@ -619,6 +636,37 @@ color => {
                               tar[0] = Y+0.95568806036115671171*0.2;
                               tar[1] = Y-0.27158179694405859326*0.2;
                               tar[2] = Y-1.1081773266826619523*0.2;' },
+                                      
+  'cmwood' =>      { desc => 'Wood color mapping.',
+                     calc => 'double gray = (src[0]+src[1]+src[2])/3.0;
+                              double l = (gray*density-(int)gray*density)/3.0;
+                              tar[0] = 2.0/3.0 + l;
+                              tar[1] = 1.0/3.0 + l;
+                              tar[2] = 0;',
+                     prms => {'density' => { def => 5 } }},
+                                      
+  'cmmarble' =>    { desc => 'Marble color mapping.',
+                     calc => 'double gray = (src[0]+src[1]+src[2])/3.0;
+                              double m = pow(cos((iy/(freq/h))+(gray*6.28)),4);
+                              tar[2] = (1.0+2*m)/3.0;
+                              tar[1] = 1.0/3.0 + m;
+                              tar[0] = 1.0;',
+                     prms => {'freq' => { def => 25 } }},
+                                   
+  'cmstone' =>     { desc => 'Stone color mapping.',
+                     calc => 'double m = 1 - ((1+cos((iy/(freq/w))+(src[0]*6.28)))/2) *
+                                             ((1+cos((ix/(freq/w))+(src[1]*6.28)))/2);
+                              m = src[2] * (1 - 2 * pow(m,8) / 3.0 ); 
+                              tar[2] = tar[1] = tar[0] = m;',
+                     prms => {'freq' => { def => 0.1 } }},
+                                                           
+  'csautocontrast' =>{ desc => 'Color safe autocontrast to the available range.', 
+                     init => 'tLayerStats s; stats(srcimg, &s);',
+                     calc => 'double gray = (src[0]+src[1]+src[2])/3.0;
+                              double gain = (gray-s.intmin)/(s.intmax-s.intmin);
+                              tar[0] = src[0] * gain / gray;
+                              tar[1] = src[1] * gain / gray;
+                              tar[2] = src[2] * gain / gray;' },
  }
 });
 
