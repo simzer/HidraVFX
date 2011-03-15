@@ -42,6 +42,7 @@ static char *help_str =
     "   INPUTFILE          Input PFM format file. stdin used if not specified.\n"
     "   --out=FILE         Output PFM format file. stdout used if not specified.\n"
     "   --aa=N             NxN anti alias if applicable (default = 1).\n"
+    "   --info             Print out statistics about result image."
     "\n"
     "For bug reporting instructions see README.\n"
     "\n";
@@ -185,6 +186,21 @@ int main(int argc, char *argv[])
   {
     fprintf(stderr, "error %d: Could not write file %s\n", err, outFile);
     return(err);
+  }
+
+  if (opt_get("info") != NULL)
+  {
+    tLayerStats s;
+    stats(result, &s);
+    printf("Image size: %d x %d\n", result.w, result.h);
+    printf("Minimum values per channel: %f %f %f %f\n",
+           s.min[0], s.min[1], s.min[2], s.min[3]);
+    printf("Maximum values per channel: %f %f %f %f\n",
+           s.max[0], s.max[1], s.max[2], s.max[3]);
+    printf("Mean values per channel:    %f %f %f %f\n",
+           s.mean[0], s.mean[1], s.mean[2], s.mean[3]);
+    printf("Number of visible pixels:   %d\n", s.visible);
+
   }
 
   opt_free();

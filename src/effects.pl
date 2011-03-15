@@ -13,7 +13,7 @@ basic => {
   'geoinvert' => {   desc => 'Multiplicative invert.',
                      calc => 'tar = 0.1/src;'},
   
-  'pitinvert' => {    desc => 'Invert with Pythagorean theorem.',
+  'pitinvert' => {   desc => 'Invert with Pythagorean theorem.',
                      calc => 'tar = sqrt(1.0 - src*src);'},
   
   'upshift' => {     desc => 'Increase with <shift>.', 
@@ -336,7 +336,7 @@ basic => {
                                                 def  => "0.2"},
                               'ywavelen' =>   { desc => "Vertical wavelength", 
                                                 def  => "0.2"}}},
-  'sinebear' =>    { desc => '',
+  'sinebear' =>    { desc => 'Advanced random 2D sine function',
                      init => 'double A[10];
                               int i;
                               for (i = 0; i<10; i++) A[i] = 1+(rand() % 200)/100.0;',
