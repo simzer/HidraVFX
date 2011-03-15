@@ -38,7 +38,18 @@ extern tLayerF layerbg(float bg);
 extern tLayerF layerbgs(float bgs[]);
 
 float getaapix(tLayerF l, int ch, float x, float y);
-void setpix(tLayerF l, int ch, int x, int y, float pix);
+void  setpix(tLayerF l, int ch, int x, int y, float pix);
 float getpix(tLayerF l, int ch, int x, int y);
+
+typedef struct
+{
+  float min[CHANNELS]; /**< minimum value per channel*/
+  float max[CHANNELS]; /**< maximum value per channel*/
+  float mean[CHANNELS];/**< mean value per channel*/
+  int   visible;       /**< visible pixels */
+}
+tLayerStats;
+
+extern int stats(tLayerF srcimg, tLayerStats *stats);
 
 #endif

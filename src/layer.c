@@ -137,5 +137,52 @@ float getaapix(tLayerF l, int ch, float x, float y)
   }
 }
 
+/** Calculate statistics about image:
+ *  \return error value */
+int stats(tLayerF srcimg, tLayerStats *stats)
+{
+  int err = 0;
+  int ix, iy, ch;
+  int w = srcimg.w;
+  int h = srcimg.h;
+  int count = 0;
+  for (ch = 0; ch < CHANNELS; ch++)
+  {
+    stats->min[ch]  = 0.0/0.0;
+    stats->max[ch]  = 0.0/0.0;
+    stats->mean[ch] = 0.0/0.0;
+  }
+  for (iy = 0; iy < h; iy++)
+  {
+    for (ix = 0; ix < w; ix++)
+    {
+      if(srcimg.ch[3][iy][ix] > 0.0)
+      {
+        for (ch = 0; ch < CHANNELS; ch++)
+        {
+          float src = srcimg.ch[ch][iy][ix];
+          if (   (stats->min[ch] != stats->min[ch])
+              || (src < stats->min[ch])) {
+            stats->min[ch] = src;
+          }
+          if (   (stats->max[ch] != stats->max[ch])
+              || (src > stats->max[ch])) {
+            stats->max[ch] = src;
+          }
+          stats->mean[ch] = (stats->mean[ch] != stats->mean[ch])
+                            ? src : stats->mean[ch] + src;
+          count++;
+        }
+      }
+    }
+  }
+  for (ch = 0; ch < CHANNELS; ch++)
+  {
+    stats->mean[ch] = stats->mean[ch]/count;
+  }
+  stats->visible = count;
+
+  return(err);
+}
 
 

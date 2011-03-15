@@ -20,6 +20,13 @@ basic => {
                      calc => 'tar = src + shift; tar = tar - (int)tar;',
                      prms => {'shift'  => { def => 0.25 }}}, 
   
+  'noise'  => {      desc => 'Add noise.', 
+                     calc => 'double r = rand()/(double)RAND_MAX;
+                              r = r > (1-src) ? src+(1-src)*(r-(1-src))/src :
+                                  r < (1-src) ? src*r/(1-src) : 0;
+                              tar = factor*r + (1-factor)*src;',
+                     prms => {'factor'  => { def => 0.25 }}}, 
+                       
   'bright' => {      desc => 'Additional bright with <bright>.', 
                      calc => 'tar = src + bright;',
                      prms => {'bright' => { def => 0.25 }}},
@@ -27,7 +34,21 @@ basic => {
   'contrast' => {    desc => 'Multiplicative contrast.', 
                      calc => 'tar = (src - 0.5) * gain + 0.5;',
                      prms => {'gain'   => { def => 0.25 }}},
-  
+                     
+  'relativecontrast'=>{desc => 'Multiplicative contrast relative to specified map.', 
+                     calc => 'tar = (src - ref) * gain + ref;',
+                     prms => {'gain'   => { def => 0.25 },
+                              'ref'    => { def => 0.5,  test => "addimg.pfm" } }},
+                     
+  'mappedcontrast'=>{desc => 'Contrast between the specified maps or values.', 
+                     calc => 'tar = (src-min)/(max-min);',
+                     prms => {'min'    => { def => 0.25 },
+                              'max'    => { def => 0.75  } }},
+        
+  'autocontrast' =>{ desc => 'Automatic contrast to the available range.', 
+                     init => 'tLayerStats s; stats(srcimg, &s);',
+                     calc => 'tar = (src-s.min[ch])/(s.max[ch]-s.min[ch]);' },
+                             
   'bright2' => {     desc => 'Multiplicative bright', 
                      calc => 'tar = (bright < 0) ? src*(1.0+bright) : src+(1.0-src)*bright;',
                      prms => {'bright' => { def => 0.25 }}},
@@ -40,14 +61,29 @@ basic => {
                      calc => 'tar = src<=limit ? 0 : log(xmax*(src-limit)/(1.0-limit)+1)/log(xmax+1);',
                      prms => {'limit'  => { def => 0.25 }, 
                               'xmax'   => { def => 2 }}},
+                              
   'blend' =>       { desc => 'Blends two image.',
                      calc => 'double alp = alpha * add[3];
                               tar    = src*(1-alp)+add*alp;',
                      prms => {'alpha' => { def  => 0.5 },
                               'add'   => { test => "addimg.pfm" } }},
+                              
   'binary' =>      { desc => 'Cut to binary values based on threshold.',
                      calc => 'tar = src < threshold ? 0.0 : 1.0;',
                      prms => {'threshold' => { def  => 0.5 } }},
+                     
+  'mint' =>        { desc => 'Cut to binary values based on threshold and gamma.',
+                     init => 'tLayerStats stat; stats(srcimg, &stat);',
+                     calc => 'double val = stat.max[ch] * pow(src/stat.max[ch],gamma);
+                              tar = (val > threshold) ? stat.max[ch] : 0.0;',
+                     prms => {'threshold' => { def  => 0.5 },
+                     	      'gamma'     => { def  => 2.0 } }},
+                     	      
+  'level' =>       { desc => 'Cut to color levels.',
+                     init => 'tLayerStats s; stats(srcimg, &s);',
+                     calc => 'int cnt = (level * (src - s.min[ch]) / (s.max[ch] - s.min[ch]));
+                              tar =  s.min[ch] + cnt * (s.max[ch] - s.min[ch]) / level;',
+                     prms => {'level' => { def  => 10 } }},
  },
  blendings => {
   'allanon' => {     desc => 'Mean of pixel pair.', 
