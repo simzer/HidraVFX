@@ -562,6 +562,8 @@ color => {
                               src[(int)source] = temp;',
                      prms => {'source' => { def => 0 },
                               'target' => { def => 1 } }},
+ },
+ grayscale => {
   'grayscale'  =>  { desc => 'Grayscale conversion.',
                      calc => 'tar[0] = tar[1] = tar[2] = 
                                 (src[0] + src[1] + src[2])/3.0;' },
@@ -574,9 +576,15 @@ color => {
   'pitgrayscale'=> { desc => 'Grayscale conversion.',
                      calc => 'tar[0] = tar[1] = tar[2] =
                                 sqrt((sqr(src[0])+sqr(src[1])+sqr(src[2]))/3.0);' },
-  }
+ },
+ color => {
+  'sephia' =>      { desc => 'Sephia color mapping.',
+                     calc => 'double Y = 0.299*src[0] + 0.587*src[1] + 0.114*src[0];
+                              tar[0] = Y+0.95568806036115671171*0.2;
+                              tar[1] = Y-0.27158179694405859326*0.2;
+                              tar[2] = Y-1.1081773266826619523*0.2;' },
  }
-);
+});
 
 
 __DATA__
