@@ -667,6 +667,46 @@ color => {
                               tar[0] = src[0] * gain / gray;
                               tar[1] = src[1] * gain / gray;
                               tar[2] = src[2] * gain / gray;' },
+
+  'setHSV' =>      { desc => 'Shift Hue, Saturation, Value.',
+                     calc => 'tcolor HSV; ccRGB2HSV(src, HSV);
+                              HSV[0] = HSV[0] + dH;
+                              HSV[0] = HSV[0] - floorf(HSV[0]);
+                              HSV[1] = limit(0,HSV[1]+dS,1);
+                              HSV[2] = limit(0,HSV[2]+dV,1);
+                              ccHSV2RGB(HSV, tar);',
+                     prms => {'dH' => { def => 0.3 },
+                              'dS' => { def => 0.2 },
+                              'dV' => { def => 0.1 } }},
+                              
+  'YIQ2RGB' =>     { desc => 'YIQ to RGB color conversion.',
+                     calc => 'colorconv(src, ccYIQ2RGB, tar);' },
+  'RGB2YIQ' =>     { desc => 'RGB to YIQ color conversion.',
+                     calc => 'colorconv(src, ccRGB2YIQ, tar);' },
+  'LMS2RGB' =>     { desc => 'LMS to RGB color conversion.',
+                     calc => 'colorconv(src, ccLMS2RGB, tar);' },
+  'LMS2RGB' =>     { desc => 'LMS to RGB color conversion.',
+                     calc => 'colorconv(src, ccRGB2LMS, tar);' },
+  'RGB2XYZ' =>     { desc => 'RGB to XYZ color conversion.',
+                     calc => 'colorconv(src, ccRGB2XYZ, tar);' },
+  'XYZ2RGB' =>     { desc => 'XYZ to RGB color conversion.',
+                     calc => 'colorconv(src, ccXYZ2RGB, tar);' },
+  'YCbCr2RGB' =>   { desc => 'YCbCr to RGB color conversion.',
+                     calc => 'colorconv(src, ccYCbCr2RGB, tar);' },
+  'RGB2YCbCr' =>   { desc => 'RGB to YCbCr color conversion.',
+                     calc => 'colorconv(src, ccRGB2YCbCr, tar);' },
+  'HSV2RGB' =>     { desc => 'HSV to RGB color conversion.',
+                     calc => 'ccHSV2RGB(src, tar);' },
+  'RGB2HSV' =>     { desc => 'RGB to HSV color conversion.',
+                     calc => 'ccRGB2HSV(src, tar);' },
+  'RGB2LAB' =>     { desc => 'RGB to LAB color conversion.',
+                     calc => 'ccRGB2LAB(src, tar);' },
+  'LAB2RGB' =>     { desc => 'LAB to RGB color conversion.',
+                     calc => 'ccLAB2RGB(src, tar);' },
+  'RGB2HSI' =>     { desc => 'RGB to HSI color conversion.',
+                     calc => 'ccRGB2HSI(src, tar);' },
+  'RGB2YC1C2' =>   { desc => 'RGB to YC1C2 color conversion.',
+                     calc => 'ccRGB2YC1C2(src, tar);' },
  }
 });
 

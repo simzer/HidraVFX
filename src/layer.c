@@ -23,6 +23,7 @@ along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 #include <mathplus.h>
 #include "interpol.h"
 #include "layer.h"
+#include "color.h"
 
 tLayerF layerF(int w, int h)
 {

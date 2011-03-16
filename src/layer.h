@@ -17,8 +17,10 @@ You should have received a copy of the GNU General Public License
 along with HidraVFX. If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************/
 
-#ifndef DATATYPES_H_
-#define DATATYPES_H_
+#ifndef LAYER_H_
+#define LAYER_H_
+
+#include "color.h"
 
 typedef float* tLineF;
 typedef tLineF* tMapF;

@@ -45,4 +45,4 @@ close INDEX;
 
 print ("Testing done. Processing time: $time sec\n\n");
 `rm report/images/*.pfm`;
-`cp -r report/images ../../HidraVFX-gh-pages/images`;
+`cp -r report/images ../../HidraVFX-gh-pages`;
