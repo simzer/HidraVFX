@@ -380,6 +380,15 @@ basic => {
  }
 },
 distortions => {
+ simple  => {
+  'resize' =>       {desc => 'Resize the image.',
+                     calc => 'x1 = l+(srcimg.w-1)*(x-left)/(width-1);
+                              y1 = t+(srcimg.h-1)*(y-top)/(height-1);',
+                     prms => {'left'    => { def => 0 },
+                              'top'     => { def => 0 }, 
+                              'width'   => { def => 1024 }, 
+                              'height'  => { def => 768 } }},
+ },
  conform => {
   # CONFORM DISTORSIONS
   'bolyaiSphere' => {desc => 'Bolyai hyperbolic geometry conversion',

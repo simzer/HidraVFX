@@ -28,6 +28,9 @@ extern int opt_init(int argc, char *argv[]);
 /** Gets option index for key */
 int opt_get_id(char* key);
 
+/** Checks if option exists */
+int opt_exists(char* key);
+
 /** Gets option string for key */
 extern char* opt_gets(char* key);
 

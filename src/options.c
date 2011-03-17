@@ -143,6 +143,11 @@ int opt_get_id(char* key)
   return(-1);
   }
 
+int opt_exists(char* key)
+  {
+  return( (opt_get_id(key) != -1) ? 1 : 0);
+  }
+
 char* opt_gets(char* key)
   {
   int i = opt_get_id(key);

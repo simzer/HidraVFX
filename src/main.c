@@ -91,6 +91,7 @@ int main(int argc, char *argv[])
 {
   int err;
   int i;
+  float width, height;
   char *inFile;
   char *outFile;
   char *command;
@@ -170,7 +171,9 @@ int main(int argc, char *argv[])
 
   err = 1;
 
-  result = layerF(image.w, image.h);
+  width  = opt_exists("width") ? opt_getf("width") : image.w;
+  height = opt_exists("height") ? opt_getf("height") : image.h;
+  result = layerF(width, height);
 
 #include "../bin/cmdproc.i"
 

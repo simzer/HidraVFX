@@ -109,8 +109,10 @@ int <NAME>(
 {
   int err = 0;
   int aa = (opt_get("aa") != NULL) ? opt_getl("aa") : 1;
-  int w = srcimg.w;
-  int h = srcimg.h;
+  int l = tarimg.l;
+  int t = tarimg.t;
+  int w = tarimg.w;
+  int h = tarimg.h;
   int ix, iy, ia, ixa, iya, ch;
   double x, y;
   double x1, y1;
@@ -127,8 +129,8 @@ int <NAME>(
       	ch = 0;
         ixa = ia % aa;
         iya = ia / aa;
-        x = ix + ixa/aa - (aa-1)/aa/2.0;
-        y = iy + iya/aa - (aa-1)/aa/2.0;
+        x = ix + l + ixa/aa - (aa-1)/aa/2.0;
+        y = iy + t + iya/aa - (aa-1)/aa/2.0;
         {<CALC>
         }
         for(ch = 0; ch < CHANNELS; ch++)
