@@ -1,4 +1,4 @@
-ADD_LIBRARY(hidra SHARED layer.c effects.c color.c)
+ADD_LIBRARY(hidra SHARED layer.c effects.c color.c set.c convolution.c)
 ADD_EXECUTABLE(hidravfx main.c options.c pnm.c)
 TARGET_LINK_LIBRARIES(hidravfx m hidra)
 INSTALL(

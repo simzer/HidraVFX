@@ -13,17 +13,18 @@ open TESTS, 'tests';
 for (<TESTS>) 
 {
   chomp;
-  ($cmd, @params) = split /\s+/, $_;
-  if ( -e "report/images/$cmd.jpg" ) {} else {
-    $report .= "<tr><td><a href=\"images/$cmd.jpg\"><img src=\"images/$cmd.jpg\" width=\"240\" height=\"180\" /></a></td><td>\n<pre>";
+  ($num, $cmd, @params) = split /\s+/, $_;
+  $num = ($num == 0) ? '' : "-$num";
+  if ( -e "report/images/$cmd$num.jpg" ) {} else {
+    $report .= "<tr><td><a href=\"images/$cmd$num.jpg\"><img src=\"images/$cmd$num.jpg\" width=\"240\" height=\"180\" /></a></td><td>\n<pre>";
     $report .=  `../bin/hidravfx help $cmd`;
     $report .=  "</pre></td></tr>\n";
-    $res = `cd report; (time ../../bin/hidravfx $cmd --out=images/$cmd.pfm @params test.pfm >/dev/null) 2>&1`;
+    $res = `cd report; (time ../../bin/hidravfx $cmd --out=images/$cmd$num.pfm @params test.pfm >/dev/null) 2>&1`;
     $res =~ /real\s+(\d+)+m(\d+)\.(\d+)s/;
     $time += $1 * 60 + $2 + $3/1000;
     print "Testing $cmd command: \t";
     print "$1 min $2.$3 sec, done.\n";
-    `cd report/images; convert $cmd.pfm $cmd.jpg`;
+    `cd report/images; convert $cmd$num.pfm $cmd$num.jpg`;
   }
 }
 $report .= <<REPORT;

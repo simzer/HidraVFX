@@ -64,6 +64,7 @@ int <NAME>(
       tarimg.ch[3][iy][ix] = srcimg.ch[3][iy][ix];
     }
   }
+  <POST>
   return(err);
 }
 
@@ -95,6 +96,7 @@ int <NAME>(
       for (ch = 0; ch < CHANNELS; ch++) tarimg.ch[ch][iy][ix] = tar[ch];
     }
   }
+  <POST>
   return(err);
 }
 
@@ -144,6 +146,7 @@ int <NAME>(
       }
     }
   }
+  <POST>
   return(err);
 }
 CODE
@@ -182,29 +185,47 @@ for my $group (sort(keys(%effects)))
     my $desc = $funchash->{desc};
     my $calc = $funchash->{calc};
     my $init = $funchash->{init};
+    my $post = $funchash->{post};
     my $prms = $funchash->{prms};
     my $paramdefs  = '';
     my $paramcalls = '';
     my $paramindex = $paramcnt;
     
-    $testcalls    .= "$func";
     push @cmdlist, $name; 
     $paramindices .= "$paramindex, ";
+    my $testnum = 1;
     for (keys(%{$prms}))
     {
       $calc =~ s/\b$_\[([^]]*)\]/getpix(_$_,$1,ix,iy)/g;
       $calc =~ s/\b$_\b/getpix($_,ch,ix,iy)/g;
       $calc =~ s/\b_$_\b/$_/g;
+      $init =~ s/\b$_\b/$_.bg[0]/g;
+      $post =~ s/\b$_\b/$_.bg[0]/g;
       $paramdefs .= ",\n  tLayerF $_\t/* $prms->{$_}->{desc} */";
       $paramcalls.= ", getOpt(\"$_\")";
       $paramlist .= "\"$_\",\n";
       $paramdescs.= "\"$prms->{$_}->{desc}\",\n";
-      $testcalls .= (exists $prms->{$_}->{test}) ? " --$_=$prms->{$_}->{test}" : 
-                    (exists $prms->{$_}->{def})  ? " --$_=$prms->{$_}->{def}"  : 
-                                                   '';
       $paramcnt++;
+      if ((exists $prms->{$_}->{test}) && (ref($prms->{$_}->{test}) eq 'ARRAY')) {
+        if ($testnum < scalar @{$prms->{$_}->{test}}) { 
+          $testnum = scalar @{$prms->{$_}->{test}}; 
+        }
+      }
     } 
-    $testcalls   .= "\n";
+    
+    for (my $i = 0; $i < $testnum; $i++)
+    {
+      $testcalls    .= "$i $func";
+      for (keys(%{$prms})) {
+        $testcalls .= (exists $prms->{$_}->{test}) 
+                      ? ( (ref($prms->{$_}->{test}) eq 'ARRAY')
+                          ? " --$_=$prms->{$_}->{test}->[$i]"
+                          : " --$_=$prms->{$_}->{test}" ) 
+                      : (exists $prms->{$_}->{def})  
+                        ? " --$_=$prms->{$_}->{def}" : '';
+      }
+      $testcalls   .= "\n";
+    }
     $paramnums   .= ($paramcnt-$paramindex).", ";
 
     $effectlist  .= "  \"$name\",\n";
@@ -213,8 +234,9 @@ for my $group (sort(keys(%effects)))
     my $fdf = $funcdef{$group};
     $fdf =~ s/<NAME>/$name/g;
     $fdf =~ s/<DESC>/$desc/g;
-    $fdf =~ s/<CALC>/$calc/g;
     $fdf =~ s/<INIT>/$init/g;
+    $fdf =~ s/<CALC>/$calc/g;
+    $fdf =~ s/<POST>/$post/g;
     $fdf =~ s/<PARAMS>/$paramdefs/g;
     $funcdefs .= $fdf;
   
@@ -250,6 +272,9 @@ $copyright
 #include "mathplus.h"
 #include "options.h"
 #include "layer.h"
+#include "set.h"
+#include "color.h"
+#include "convolution.h"
 #include "effects.h"
 
 int   effectnum = $effectcnt;
