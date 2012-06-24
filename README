@@ -1,0 +1,44 @@
+NAME
+
+   HidraVFX
+
+SUMMARY
+
+   High dynamic range visual effect library and command line application.
+
+NEWS
+
+   2011.03.19 - 0.3.0 released. New features: color space conversions, fractal
+                set generation.
+   2011.03.15 - HidraVFX 0.2.0 released. New features: basic analytic textures
+                added.
+   2011.03.07 - First version of HidraVFX 0.1.0 released.
+
+DESCRIPTION
+
+   Features:
+    * Image blendings.
+    * Distorsion effects.
+    * Texture generations.
+    * Fractal generations.
+    * Channel manipulations and color space conversions
+    * Processing HDR/floating point images. Supported format: PFM - Portable
+      Float Map.
+    * Position dependent parameters. Parameter fields can be specified with
+      images instead of single values.
+    * Anti-alias for effect where applicable.
+    * CLI interface with Bash parameter completion support.
+
+INSTALL
+
+   cmake .
+   make
+   make install
+
+LICENSE
+
+   GPLv3
+
+CONTACT
+
+   Laszlo.simon (laszlo.simon@gmail.com)
